@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # TheBashTestLoader - Фейковый системный загрузчик
-# Версия 4.2 - Исправлены все синтаксические ошибки
+# Версия 4.3 - Исправлен прогресс бар
 
 # Цвета для вывода
 RED='\033[0;31m'
@@ -26,18 +26,35 @@ get_real_data() {
     REAL_OS=$(lsb_release -d 2>/dev/null | cut -f2 || echo "Debian GNU/Linux 12")
 }
 
-# Функция прогресс-бара
+# Функция прогресс-бара (исправленная)
 progress_bar() {
     local duration=$1
     local steps=50
-    local step_delay=$(echo "scale=3; $duration/$steps" | awk '{print $1}')
+    # Исправляем вычисление задержки
+    local step_delay=$(echo "scale=3; $duration/$steps" | bc 2>/dev/null || echo "0.1")
     
     for ((i=0; i<=steps; i++)); do
         printf "\r[${BLUE}"
         for ((j=0; j<i; j++)); do printf "█"; done
         for ((j=i; j<steps; j++)); do printf "░"; done
         printf "${NC}] %d%%" $((i*2))
-        sleep $step_delay
+        sleep $step_delay 2>/dev/null || sleep 0.1
+    done
+    printf "\n"
+}
+
+# Альтернативная версия прогресс-бара (если первая не работает)
+simple_progress_bar() {
+    local duration=$1
+    local steps=20
+    local step_delay=$(echo "scale=2; $duration/$steps" | bc 2>/dev/null || echo "0.2")
+    
+    for ((i=0; i<=steps; i++)); do
+        printf "\r["
+        for ((j=0; j<i; j++)); do printf "#"; done
+        for ((j=i; j<steps; j++)); do printf "."; done
+        printf "] %d%%" $((i*5))
+        sleep $step_delay 2>/dev/null || sleep 0.2
     done
     printf "\n"
 }
@@ -474,7 +491,7 @@ main() {
     grub_loader
     
     clear
-    echo -e "${GREEN}TheBashTestLoader v4.2${NC}"
+    echo -e "${GREEN}TheBashTestLoader v4.3${NC}"
     echo -e "${YELLOW}UEFI Firmware Initializing...${NC}"
     sleep 1.5
     
