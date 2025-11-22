@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # TheBashTestLoader - Фейковый системный загрузчик
-# Версия 4.1 - Исправлены ошибки синтаксиса
+# Версия 4.2 - Исправлены все синтаксические ошибки
 
 # Цвета для вывода
 RED='\033[0;31m'
@@ -474,7 +474,7 @@ main() {
     grub_loader
     
     clear
-    echo -e "${GREEN}TheBashTestLoader v4.1${NC}"
+    echo -e "${GREEN}TheBashTestLoader v4.2${NC}"
     echo -e "${YELLOW}UEFI Firmware Initializing...${NC}"
     sleep 1.5
     
@@ -537,16 +537,4 @@ main() {
 }
 
 # Проверка и запуск
-if [ -f /etc/debian_version ]; then
-    main "$@"
-else
-    echo "This loader is optimized for Debian systems"
-    read -p "Continue anyway? (y/n) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        main "$@"
-    else
-        echo "Aborted."
-        exit 1
-    fi
-fi
+main "$@"
