@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # TheBashTestLoader - Фейковый системный загрузчик
-# Версия 3.0 - Реальные данные и расширенные этапы
+# Версия 4.0 - 30 этапов загрузки
 
 # Цвета для вывода
 RED='\033[0;31m'
@@ -11,30 +11,19 @@ BLUE='\033[0;34m'
 PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 WHITE='\033[1;37m'
+ORANGE='\033[0;33m'
 NC='\033[0m'
 
 # Функция для получения реальных данных
 get_real_data() {
-    # Получение реального имени хоста
     REAL_HOSTNAME=$(hostname 2>/dev/null || echo "debian-server")
-    
-    # Получение реального имени пользователя
     REAL_USER=$(whoami 2>/dev/null || echo "user")
-    
-    # Получение реальной архитектуры
     REAL_ARCH=$(uname -m 2>/dev/null || echo "x86_64")
-    
-    # Получение реальной версии ядра
-    REAL_KERNEL=$(uname -r 2>/dev/null || echo "5.15.0-91-generic")
-    
-    # Получение реального количества CPU
-    REAL_CPUS=$(nproc 2>/dev/null || echo "4")
-    
-    # Получение реальной памяти
-    REAL_MEMORY=$(free -h 2>/dev/null | awk '/Mem:/ {print $2}' || echo "8G")
-    
-    # Получение реального дискового пространства
-    REAL_DISK=$(df -h / 2>/dev/null | awk 'NR==2 {print $2}' || echo "50G")
+    REAL_KERNEL=$(uname -r 2>/dev/null || echo "6.1.0-15-generic")
+    REAL_CPUS=$(nproc 2>/dev/null || echo "8")
+    REAL_MEMORY=$(free -h 2>/dev/null | awk '/Mem:/ {print $2}' || echo "16G")
+    REAL_DISK=$(df -h / 2>/dev/null | awk 'NR==2 {print $2}' || echo "500G")
+    REAL_OS=$(lsb_release -d 2>/dev/null | cut -f2 || echo "Debian GNU/Linux 12")
 }
 
 # Функция прогресс-бара
@@ -59,127 +48,216 @@ system_msg() {
     echo -e "${CYAN}[$timestamp]${NC} $1"
 }
 
-# Функция BIOS/UEFI инициализации
+# Этап 1: BIOS/UEFI инициализация
 bios_init() {
     echo -e "\033[2J\033[H"
-    echo -e "${WHITE}American Megatrends BIOS Version 2.14.1234${NC}"
-    echo "Copyright (C) 2023 American Megatrends, Inc."
+    echo -e "${WHITE}American Megatrends BIOS Version 2.18.1267${NC}"
+    echo "Copyright (C) 2024 American Megatrends, Inc."
     echo ""
     echo -e "CPU: ${YELLOW}Intel(R) Xeon(R) CPU E5-2697 v4 @ 2.30GHz${NC}"
-    echo -e "Memory: ${YELLOW}Testing 65536MB${NC}"
+    echo -e "Memory: ${YELLOW}Testing 131072MB${NC}"
     sleep 1
-    echo -e "Memory: ${GREEN}OK${NC} 65536MB"
+    echo -e "Memory: ${GREEN}OK${NC} 131072MB"
     sleep 0.5
     echo -e "SATA: ${GREEN}Intel(R) SATA Controller${NC}"
     sleep 0.5
-    echo -e "NVMe: ${GREEN}Samsung SSD 960 PRO 512GB${NC}"
+    echo -e "NVMe: ${GREEN}Samsung SSD 980 PRO 1TB${NC}"
     sleep 0.5
-    echo -e "Network: ${GREEN}Intel I219-LM Ethernet${NC}"
+    echo -e "Network: ${GREEN}Intel I225-LM Ethernet${NC}"
     sleep 1
     echo ""
     echo -e "Press ${WHITE}F2${NC} for Setup, ${WHITE}F12${NC} for Boot Menu"
     sleep 2
 }
 
-# Функция загрузчика GRUB
+# Этап 2: GRUB загрузчик
 grub_loader() {
     echo -e "\033[2J\033[H"
-    echo -e "${PURPLE}GNU GRUB version 2.06${NC}"
+    echo -e "${PURPLE}GNU GRUB version 2.12${NC}"
     echo ""
-    echo -e "${GREEN}▶${NC} Debian GNU/Linux"
-    echo "   Advanced options for Debian GNU/Linux"
+    echo -e "${GREEN}▶${NC} $REAL_OS"
+    echo "   Advanced options for $REAL_OS"
     echo "   Memory test (memtest86+)"
     echo "   Memory test (memtest86+, serial console)"
+    echo "   Windows Boot Manager"
+    echo "   Ubuntu 22.04 LTS"
     echo ""
     echo -e "Use the ↑ and ↓ keys to select which entry is highlighted."
     sleep 3
 }
 
-# Функция проверки оборудования
-hardware_check() {
-    system_msg "Starting hardware initialization sequence"
+# Этап 3: Загрузка ядра
+kernel_loading() {
+    system_msg "Loading Linux kernel $REAL_KERNEL"
     sleep 0.8
+    echo -e "   ${GREEN}✓${NC} Uncompressing Linux kernel..."
+    sleep 0.5
+    echo -e "   ${GREEN}✓${NC} Setting up kernel identity map"
+    sleep 0.5
+    echo -e "   ${GREEN}✓${NC] Decompressing kernel modules"
+    progress_bar 2
+}
+
+# Этап 4: Инициализация оборудования
+hardware_detection() {
+    system_msg "Detecting hardware components"
     
     local devices=(
         "ACPI: Core subsystem"
         "CPU: Intel(R) Xeon(R) CPU E5-2697 v4 @ 2.30GHz"
-        "Memory: Testing 65536MB"
+        "Memory: Testing 131072MB"
         "PCI: Probing PCI hardware"
         "SATA: Link up 6.0 Gbps"
-        "NVMe: Samsung SSD 960 PRO 512GB"
-        "Network: Intel I219-LM Ethernet"
-        "USB: USB 3.0 controller"
-        "GPU: NVIDIA Quadro RTX 4000"
-        "Audio: Realtek ALC1220"
+        "NVMe: Samsung SSD 980 PRO 1TB"
+        "Network: Intel I225-LM Ethernet"
+        "USB: USB 3.2 controller"
+        "GPU: NVIDIA RTX A6000"
+        "Audio: Realtek ALC1220-VB"
+        "Thunderbolt: Controller found"
+        "Bluetooth: Intel Wireless-AC"
+        "WiFi: Intel Wi-Fi 6E AX210"
     )
     
     for device in "${devices[@]}"; do
         echo -e "   ${GREEN}✓${NC} $device"
-        sleep 0.2
+        sleep 0.15
     done
-    
-    # Случайные события для реалистичности
-    if [ $((RANDOM % 3)) -eq 0 ]; then
-        echo -e "   ${YELLOW}⚠${NC} USB device over current state"
-        sleep 0.8
-        echo -e "   ${GREEN}✓${NC} USB over current condition cleared"
-    fi
+    progress_bar 3
 }
 
-# Функция загрузки ядра
-kernel_load() {
-    system_msg "Loading Linux kernel $REAL_KERNEL"
-    sleep 0.5
+# Этап 5: Загрузка модулей ядра
+kernel_modules() {
+    system_msg "Loading kernel modules"
     
     local modules=(
         "ext4" "usbcore" "uhci_hcd" "ehci_pci" "ahci" "nvme" 
         "e1000e" "i915" "nvidia" "snd_hda_intel" "kvm" "xfs"
-        "dm_crypt" "tun" "bridge" "veth" "ip_tables"
+        "dm_crypt" "tun" "bridge" "veth" "ip_tables" "xt_state"
+        "nf_conntrack" "iptable_filter" "ip6_tables" "bluetooth"
+        "iwlmvm" "mac80211" "thunderbolt" "usb_storage"
     )
     
     for module in "${modules[@]}"; do
         echo -e "   ${GREEN}[OK]${NC} Loaded module: $module"
-        sleep 0.15
+        sleep 0.1
     done
-    
-    system_msg "Kernel command line: BOOT_IMAGE=/vmlinuz-$REAL_KERNEL root=/dev/mapper/debian--vg-root ro quiet splash"
-    sleep 0.8
+    progress_bar 2
 }
 
-# Функция инициализации сети
-network_init() {
-    system_msg "Initializing network interfaces"
-    sleep 0.7
+# Этап 6: Ранняя файловая система
+early_filesystem() {
+    system_msg "Setting up early userspace"
+    echo -e "   ${GREEN}✓${NC} Mounting tmpfs on /tmp"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} Creating device nodes"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} Mounting proc filesystem"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} Mounting sys filesystem"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} Mounting devpts filesystem"
+    progress_bar 2
+}
+
+# Этап 7: Инициализация DMA
+dma_init() {
+    system_msg "Initializing Direct Memory Access"
+    echo -e "   ${GREEN}✓${NC} DMA controller: Intel 8237"
+    sleep 0.4
+    echo -e "   ${GREEN}✓${NC} DMA channels allocated"
+    sleep 0.4
+    echo -e "   ${GREEN}✓${NC} DMA memory pools created"
+    progress_bar 1
+}
+
+# Этап 8: Инициализация прерываний
+interrupts_init() {
+    system_msg "Configuring interrupt handlers"
+    echo -e "   ${GREEN}✓${NC} IOAPIC: Version 0x20 Vectors 64:87"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} APIC: Enabled"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} SMP: CPU 0-15 configured"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} IRQ: Balance enabled"
+    progress_bar 2
+}
+
+# Этап 9: Тактовые генераторы
+clocks_init() {
+    system_msg "Initializing system clocks"
+    echo -e "   ${GREEN}✓${NC} TSC: Clock source stable"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} HPET: 4 timers configured"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} ACPI: Power management timer"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} RTC: Synchronized to hardware clock"
+    progress_bar 1
+}
+
+# Этап 10: Управление питанием
+power_management() {
+    system_msg "Configuring power management"
+    echo -e "   ${GREEN}✓${NC} ACPI: Core subsystem initialized"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} CPU Frequency scaling: intel_pstate"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} Thermal: Intel thermal driver"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} Suspend: S3 mode enabled"
+    progress_bar 2
+}
+
+# Этап 11: Сетевые протоколы
+network_protocols() {
+    system_msg "Initializing network protocols"
     
-    local interfaces=("eth0" "wlan0" "docker0" "br0")
+    local protocols=(
+        "TCP: IPv4 implementation"
+        "UDP: IPv4 implementation" 
+        "IP: Core protocol"
+        "ICMP: Control messages"
+        "ARP: Address resolution"
+        "NETFILTER: Framework"
+        "BRIDGE: STP protocol"
+        "VLAN: 802.1Q support"
+    )
+    
+    for protocol in "${protocols[@]}"; do
+        echo -e "   ${GREEN}✓${NC} $protocol"
+        sleep 0.2
+    done
+    progress_bar 2
+}
+
+# Этап 12: Сетевые интерфейсы
+network_interfaces() {
+    system_msg "Bringing up network interfaces"
+    
+    local interfaces=(
+        "eth0: 1Gbps/Full duplex"
+        "wlan0: WiFi 6E connected"
+        "docker0: Bridge created"
+        "br0: Virtual bridge"
+        "veth0: Virtual ethernet"
+        "tun0: VPN tunnel"
+    )
     
     for iface in "${interfaces[@]}"; do
-        if [ $((RANDOM % 4)) -eq 0 ]; then
-            echo -e "   ${YELLOW}[SKIP]${NC} $iface: Interface not found"
-        else
-            echo -e "   ${GREEN}✓${NC} $iface: Link is up - 1Gbps/Full"
-            sleep 0.2
-        fi
+        echo -e "   ${GREEN}✓${NC} $iface"
+        sleep 0.3
     done
     
     echo -e "   ${GREEN}✓${NC} eth0: DHCP assigned 192.168.1.105/24"
     sleep 0.3
-    echo -e "   ${GREEN}✓${NC} DNS: 192.168.1.1, 8.8.8.8"
-    sleep 0.3
     echo -e "   ${GREEN}✓${NC} Gateway: 192.168.1.1"
-    sleep 0.5
-    
-    system_msg "Testing network connectivity"
-    sleep 1
-    echo -e "   ${GREEN}✓${NC} Ping to gateway successful"
-    sleep 0.3
-    echo -e "   ${GREEN}✓${NC} Internet connectivity verified"
+    progress_bar 3
 }
 
-# Функция проверки файловой системы
-filesystem_check() {
-    system_msg "Running filesystem checks"
-    sleep 1
+# Этап 13: Файловые системы
+filesystem_mount() {
+    system_msg "Mounting filesystems"
     
     local mounts=(
         "/dev/nvme0n1p1: /boot/efi (vfat)"
@@ -189,281 +267,433 @@ filesystem_check() {
         "/dev/mapper/debian--vg-home: /home (ext4)"
         "/dev/mapper/debian--vg-opt: /opt (xfs)"
         "/dev/sdb1: /data (ext4)"
+        "/dev/sdc1: /backup (xfs)"
+        "tmpfs: /dev/shm (tmpfs)"
+        "proc: /proc (proc)"
+        "sysfs: /sys (sysfs)"
     )
     
     for mount in "${mounts[@]}"; do
-        echo -e "   ${GREEN}✓${NC} $mount: Clean, $REAL_DISK available"
-        sleep 0.3
+        echo -e "   ${GREEN}✓${NC} $mount"
+        sleep 0.2
     done
-    
-    system_msg "Mounting filesystems"
+    progress_bar 3
+}
+
+# Этап 14: Проверка целостности
+integrity_check() {
+    system_msg "Running filesystem integrity checks"
+    echo -e "   ${GREEN}✓${NC} /: Clean, journal recovery not needed"
+    sleep 0.4
+    echo -e "   ${GREEN}✓${NC} /var: Clean"
+    sleep 0.4
+    echo -e "   ${GREEN}✓${NC} /home: Clean"
+    sleep 0.4
+    echo -e "   ${GREEN}✓${NC} /data: Clean"
+    sleep 0.4
+    echo -e "   ${GREEN}✓${NC} All filesystems verified"
     progress_bar 2
 }
 
-# Функция запуска системных служб
-services_start() {
-    system_msg "Starting system services"
+# Этап 15: Системные демоны
+system_daemons() {
+    system_msg "Starting core system daemons"
     
-    local services=(
+    local daemons=(
         "systemd-journald: Journal service"
         "dbus: System message bus"
         "systemd-networkd: Network management"
         "systemd-resolved: DNS resolution"
+        "systemd-timesyncd: Time synchronization"
+        "systemd-logind: Login management"
+        "systemd-udevd: Device management"
+    )
+    
+    for daemon in "${daemons[@]}"; do
+        echo -e "   ${GREEN}[OK]${NC} $daemon"
+        sleep 0.2
+    done
+    progress_bar 2
+}
+
+# Этап 16: Сетевые службы
+network_services() {
+    system_msg "Starting network services"
+    
+    local services=(
         "ssh: OpenSSH server"
         "cron: Scheduled tasks"
         "rsyslog: System logging"
-        "apparmor: Security framework"
-        "polkit: Authorization framework"
-        "accounts-daemon: User accounts"
-        "docker: Container runtime"
         "nginx: Web server"
-        "mysql: Database server"
         "postfix: Mail server"
+        "bind9: DNS server"
+        "apache2: Web server"
+        "mysql: Database server"
+        "postgresql: Database server"
         "redis: Cache server"
-        "elasticsearch: Search engine"
-        "kibana: Analytics dashboard"
-        "grafana: Metrics dashboard"
-        "prometheus: Monitoring"
     )
     
     for service in "${services[@]}"; do
-        local rand=$((RANDOM % 10))
-        if [ $rand -eq 0 ]; then
+        if [ $((RANDOM % 8)) -eq 0 ]; then
             echo -e "   ${YELLOW}[DELAYED]${NC} $service"
-            sleep 0.8
-            echo -e "   ${GREEN}[OK]${NC} $service"
-        elif [ $rand -eq 1 ]; then
-            echo -e "   ${RED}[FAILED]${NC} $service"
             sleep 0.5
-            echo -e "   ${GREEN}[OK]${NC} $service - Restarted"
-        else
-            echo -e "   ${GREEN}[OK]${NC} $service"
         fi
-        sleep 0.2
+        echo -e "   ${GREEN}[OK]${NC} $service"
+        sleep 0.15
     done
+    progress_bar 4
 }
 
-# Функция системного мониторинга
-system_monitoring() {
-    system_msg "Starting system monitoring"
-    sleep 0.5
-    
-    local metrics=(
-        "CPU: $REAL_CPUS cores, 2.30GHz, 48°C"
-        "Memory: $REAL_MEMORY total, 8.2GB used"
-        "Storage: $REAL_DISK total, 245GB used"
-        "Network: eth0 124Kbps/87Kbps"
-        "Temperature: Normal"
-        "Load average: 0.15, 0.12, 0.09"
-        "Processes: 347 running, 2048 total"
-        "Uptime: 0 days, 0 hours, 5 minutes"
-    )
-    
-    for metric in "${metrics[@]}"; do
-        echo -e "   ${GREEN}✓${NC} $metric"
-        sleep 0.3
-    done
-}
-
-# Функция безопасности
+# Этап 17: Безопасность
 security_init() {
     system_msg "Initializing security subsystems"
     
-    local security_checks=(
-        "AppArmor: 45 profiles loaded"
-        "Firewall: UFW activated (22/tcp, 80/tcp, 443/tcp)"
-        "SSH: Key-based authentication enabled"
-        "Updates: 12 security patches available"
-        "Audit: Audit daemon started"
-        "Encryption: LUKS volumes mounted"
+    local security=(
+        "AppArmor: 67 profiles loaded"
+        "Firewall: UFW activated (22,80,443,9090/tcp)"
         "Fail2Ban: 0 banned IPs"
-        "ClamAV: Virus database updated"
+        "ClamAV: Database version 2024.01.15"
         "SELinux: Permissive mode"
+        "Audit: Audit daemon started"
+        "PKI: Certificate authorities loaded"
+        "SSH: Key-based authentication"
+        "Encryption: LUKS volumes mounted"
     )
     
-    for check in "${security_checks[@]}"; do
-        echo -e "   ${GREEN}✓${NC} $check"
-        sleep 0.3
+    for item in "${security[@]}"; do
+        echo -e "   ${GREEN}✓${NC} $item"
+        sleep 0.2
     done
+    progress_bar 3
 }
 
-# Функция контейнеризации
+# Этап 18: Мониторинг
+monitoring_init() {
+    system_msg "Starting monitoring services"
+    
+    local monitors=(
+        "prometheus: Time series database"
+        "grafana: Metrics dashboard"
+        "node_exporter: System metrics"
+        "alertmanager: Alert routing"
+        "loki: Log aggregation"
+        "promtail: Log collection"
+        "zabbix: Enterprise monitoring"
+        "nagios: Infrastructure monitoring"
+    )
+    
+    for monitor in "${monitors[@]}"; do
+        echo -e "   ${GREEN}[OK]${NC} $monitor"
+        sleep 0.2
+    done
+    progress_bar 3
+}
+
+# Этап 19: Контейнеризация
 container_init() {
     system_msg "Initializing container runtime"
-    sleep 0.7
     
     local containers=(
-        "redis:6.2-alpine"
-        "nginx:1.21-alpine"
-        "postgres:13-alpine"
-        "node:16-alpine"
-        "python:3.9-slim"
-        "mysql:8.0"
-        "mongo:5.0"
+        "docker: Container daemon"
+        "containerd: Container runtime"
+        "runc: OCI runtime"
+        "buildah: Image builder"
+        "podman: Container manager"
+        "kubernetes: kubelet service"
     )
     
     for container in "${containers[@]}"; do
-        if [ $((RANDOM % 5)) -eq 0 ]; then
-            echo -e "   ${YELLOW}[PULLING]${NC} $container"
-            sleep 0.8
-        fi
         echo -e "   ${GREEN}[READY]${NC} $container"
-        sleep 0.3
+        sleep 0.2
     done
+    progress_bar 3
 }
 
-# Функция оркестрации
+# Этап 20: Оркестрация
 orchestration_init() {
     system_msg "Starting orchestration services"
     
-    local orch_services=(
-        "Kubernetes: kubelet starting"
+    local orch=(
+        "Kubernetes: Control plane"
         "Docker Swarm: Manager node"
         "Nomad: Scheduler ready"
         "Consul: Service discovery"
         "Vault: Secrets management"
         "Traefik: Load balancer"
+        "Linkerd: Service mesh"
+        "Istio: Service mesh"
     )
     
-    for service in "${orch_services[@]}"; do
+    for service in "${orch[@]}"; do
         echo -e "   ${GREEN}✓${NC} $service"
-        sleep 0.4
+        sleep 0.2
     done
+    progress_bar 3
 }
 
-# Функция облачных сервисов
+# Этап 21: Облачные сервисы
 cloud_init() {
     system_msg "Connecting to cloud services"
     
-    local cloud_services=(
-        "AWS: EC2 instance ready"
-        "Azure: Blob storage connected"
-        "GCP: Cloud SQL connected"
-        "DigitalOcean: Spaces mounted"
-        "Cloudflare: DNS configured"
-        "GitHub: Webhooks active"
+    local cloud=(
+        "AWS: EC2 instance metadata"
+        "Azure: Instance metadata service"
+        "GCP: Cloud SQL proxy"
+        "DigitalOcean: Metadata service"
+        "Cloudflare: Tunnel ready"
+        "GitHub: Runner connected"
+        "GitLab: CI/CD pipeline"
+        "Docker Hub: Registry connected"
     )
     
-    for service in "${cloud_services[@]}"; do
+    for service in "${cloud[@]}"; do
         echo -e "   ${GREEN}✓${NC} $service"
-        sleep 0.3
-    done
-}
-
-# Функция разработки
-development_init() {
-    system_msg "Setting up development environment"
-    
-    local dev_tools=(
-        "Git: version 2.30.2"
-        "Node.js: version 16.14.0"
-        "Python: version 3.9.2"
-        "Java: OpenJDK 11.0.12"
-        "Go: version 1.17.2"
-        "Ruby: version 3.0.0"
-        "PHP: version 8.0.8"
-        "Rust: version 1.54.0"
-    )
-    
-    for tool in "${dev_tools[@]}"; do
-        echo -e "   ${GREEN}✓${NC} $tool"
         sleep 0.2
     done
+    progress_bar 2
+}
+
+# Этап 22: Базы данных
+database_init() {
+    system_msg "Starting database services"
+    
+    local databases=(
+        "MySQL: Community Edition 8.0"
+        "PostgreSQL: Version 15.2"
+        "Redis: 7.0.11 persistent"
+        "MongoDB: 6.0.5 community"
+        "Elasticsearch: 8.7.0 cluster"
+        "InfluxDB: Time series database"
+        "Cassandra: NoSQL database"
+        "SQLite: Embedded database"
+    )
+    
+    for db in "${databases[@]}"; do
+        echo -e "   ${GREEN}[RUNNING]${NC} $db"
+        sleep 0.2
+    done
+    progress_bar 3
+}
+
+# Этап 23: Сообщения и очереди
+message_queues() {
+    system_msg "Starting message queue services"
+    
+    local queues=(
+        "RabbitMQ: AMQP broker"
+        "Apache Kafka: Stream processing"
+        "Redis Pub/Sub: Messaging"
+        "ZeroMQ: Lightweight messaging"
+        "NATS: Cloud native messaging"
+        "ActiveMQ: JMS messaging"
+    )
+    
+    for queue in "${queues[@]}"; do
+        echo -e "   ${GREEN}[READY]${NC} $queue"
+        sleep 0.2
+    done
+    progress_bar 2
+}
+
+# Этап 24: Инструменты разработки
+development_tools() {
+    system_msg "Loading development tools"
+    
+    local tools=(
+        "Git: version 2.40.1"
+        "Node.js: version 18.16.0"
+        "Python: version 3.11.2"
+        "Java: OpenJDK 17.0.6"
+        "Go: version 1.20.4"
+        "Ruby: version 3.2.2"
+        "PHP: version 8.2.4"
+        "Rust: version 1.68.2"
+        "C/C++: GCC 12.2.0"
+        ".NET: SDK 7.0.203"
+    )
+    
+    for tool in "${tools[@]}"; do
+        echo -e "   ${GREEN}✓${NC} $tool"
+        sleep 0.15
+    done
+    progress_bar 3
+}
+
+# Этап 25: Веб-серверы
+web_servers() {
+    system_msg "Starting web servers"
+    
+    local servers=(
+        "nginx: 1.24.0 - port 80,443"
+        "apache2: 2.4.57 - port 8080"
+        "tomcat: 10.1.7 - port 8081"
+        "node.js: Express server - port 3000"
+        "python: Django development - port 8000"
+        "ruby: Rails server - port 3001"
+        "php: Built-in server - port 8001"
+    )
+    
+    for server in "${servers[@]}"; do
+        echo -e "   ${GREEN}[LISTENING]${NC} $server"
+        sleep 0.2
+    done
+    progress_bar 2
+}
+
+# Этап 26: Кэширование
+caching_init() {
+    system_msg "Initializing cache layers"
+    
+    local caches=(
+        "Redis: Memory store - 512MB allocated"
+        "Memcached: Distributed cache"
+        "Varnish: HTTP accelerator"
+        "CDN: Cloudflare proxy"
+        "Browser cache: Headers configured"
+        "Database cache: Query cache enabled"
+    )
+    
+    for cache in "${caches[@]}"; do
+        echo -e "   ${GREEN}[ACTIVE]${NC} $cache"
+        sleep 0.2
+    done
+    progress_bar 2
+}
+
+# Этап 27: Бэкап системы
+backup_init() {
+    system_msg "Initializing backup systems"
+    
+    local backups=(
+        "Automated backups: Daily at 02:00"
+        "Incremental backups: Every 6 hours"
+        "Offsite storage: AWS S3 configured"
+        "Database dumps: MySQL/PostgreSQL"
+        "Log rotation: 30 days retention"
+        "Snapshot: LVM snapshots enabled"
+    )
+    
+    for backup in "${backups[@]}"; do
+        echo -e "   ${GREEN}✓${NC} $backup"
+        sleep 0.2
+    done
+    progress_bar 2
+}
+
+# Этап 28: Системный мониторинг
+system_monitoring() {
+    system_msg "Starting system monitoring"
+    
+    local metrics=(
+        "CPU: $REAL_CPUS cores, 2.30GHz, 52°C"
+        "Memory: $REAL_MEMORY total, 12.4GB used"
+        "Storage: $REAL_DISK total, 387GB used"
+        "Network: eth0 187Kbps/124Kbps"
+        "Temperature: Normal range"
+        "Load average: 0.08, 0.12, 0.15"
+        "Processes: 412 running, 2048 total"
+        "Uptime: 0 days, 0 hours, 8 minutes"
+        "Disk I/O: Read 245MB/s, Write 187MB/s"
+    )
+    
+    for metric in "${metrics[@]}"; do
+        echo -e "   ${GREEN}✓${NC} $metric"
+        sleep 0.2
+    done
+    progress_bar 3
+}
+
+# Этап 29: Пользовательские сессии
+user_sessions() {
+    system_msg "Starting user session management"
+    echo -e "   ${GREEN}✓${NC} Creating user directories"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} Setting up user profiles"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} Loading user preferences"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} Starting desktop environment"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} Session manager ready"
+    progress_bar 2
+}
+
+# Этап 30: Финальная настройка
+final_setup() {
+    system_msg "Performing final system setup"
+    echo -e "   ${GREEN}✓${NC} Setting hostname: $REAL_HOSTNAME"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} Configuring locales: en_US.UTF-8"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} Timezone: Europe/Moscow"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} Keyboard layout: us"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} System logging configured"
+    sleep 0.3
+    echo -e "   ${GREEN}✓${NC} Cron jobs initialized"
+    progress_bar 3
 }
 
 # Основная функция загрузки
 main() {
-    # Получение реальных данных
     get_real_data
     
-    # Этап 0: BIOS/UEFI
+    # Этап 1-2: BIOS и GRUB
     bios_init
-    
-    # Этап 1: GRUB загрузчик
     grub_loader
     
     clear
-    echo -e "${GREEN}TheBashTestLoader v3.0${NC}"
+    echo -e "${GREEN}TheBashTestLoader v4.0${NC}"
     echo -e "${YELLOW}UEFI Firmware Initializing...${NC}"
     sleep 1.5
     
-    # Этап 1: Инициализация оборудования
-    echo -e "\n${PURPLE}[1/12] Hardware Initialization${NC}"
-    hardware_check
-    progress_bar 3
+    # 30 этапов загрузки
+    local stages=(
+        "Kernel Loading:kernel_loading:2"
+        "Hardware Detection:hardware_detection:3"
+        "Kernel Modules:kernel_modules:2"
+        "Early Filesystem:early_filesystem:2"
+        "DMA Initialization:dma_init:1"
+        "Interrupts Setup:interrupts_init:2"
+        "System Clocks:clocks_init:1"
+        "Power Management:power_management:2"
+        "Network Protocols:network_protocols:2"
+        "Network Interfaces:network_interfaces:3"
+        "Filesystem Mount:filesystem_mount:3"
+        "Integrity Check:integrity_check:2"
+        "System Daemons:system_daemons:2"
+        "Network Services:network_services:4"
+        "Security Init:security_init:3"
+        "Monitoring Services:monitoring_init:3"
+        "Container Runtime:container_init:3"
+        "Orchestration:orchestration_init:3"
+        "Cloud Services:cloud_init:2"
+        "Database Services:database_init:3"
+        "Message Queues:message_queues:2"
+        "Development Tools:development_tools:3"
+        "Web Servers:web_servers:2"
+        "Caching Systems:caching_init:2"
+        "Backup Systems:backup_init:2"
+        "System Monitoring:system_monitoring:3"
+        "User Sessions:user_sessions:2"
+        "Final Setup:final_setup:3"
+    )
     
-    # Этап 2: Загрузка ядра
-    echo -e "\n${PURPLE}[2/12] Kernel Loading${NC}"
-    kernel_load
-    progress_bar 2
-    
-    # Этап 3: Ранняя инициализация
-    echo -e "\n${PURPLE}[3/12] Early Userspace${NC}"
-    system_msg "Setting up temporary filesystem"
-    sleep 0.8
-    system_msg "Loading initial ramdisk"
-    progress_bar 2
-    
-    # Этап 4: Сеть
-    echo -e "\n${PURPLE}[4/12] Network Configuration${NC}"
-    network_init
-    progress_bar 2
-    
-    # Этап 5: Файловая система
-    echo -e "\n${PURPLE}[5/12] Filesystem Setup${NC}"
-    filesystem_check
-    progress_bar 3
-    
-    # Этап 6: Системные службы
-    echo -e "\n${PURPLE}[6/12] System Services${NC}"
-    services_start
-    progress_bar 4
-    
-    # Этап 7: Безопасность
-    echo -e "\n${PURPLE}[7/12] Security Initialization${NC}"
-    security_init
-    progress_bar 2
-    
-    # Этап 8: Мониторинг
-    echo -e "\n${PURPLE}[8/12] System Monitoring${NC}"
-    system_monitoring
-    progress_bar 2
-    
-    # Этап 9: Контейнеризация
-    echo -e "\n${PURPLE}[9/12] Container Runtime${NC}"
-    container_init
-    progress_bar 3
-    
-    # Этап 10: Оркестрация
-    echo -e "\n${PURPLE}[10/12] Orchestration Services${NC}"
-    orchestration_init
-    progress_bar 2
-    
-    # Этап 11: Облачные сервисы
-    echo -e "\n${PURPLE}[11/12] Cloud Integration${NC}"
-    cloud_init
-    progress_bar 2
-    
-    # Этап 12: Разработка
-    echo -e "\n${PURPLE}[12/12] Development Environment${NC}"
-    development_init
-    progress_bar 3
-    
-    # Финальная настройка
-    system_msg "Setting hostname: $REAL_HOSTNAME"
-    sleep 0.5
-    system_msg "Configuring locales: en_US.UTF-8"
-    sleep 0.5
-    system_msg "Starting user sessions"
-    progress_bar 2
+    local stage_num=1
+    for stage in "${stages[@]}"; do
+        IFS=':' read -r name func duration <<< "$stage"
+        echo -e "\n${PURPLE}[$((stage_num++))/30] $name${NC}"
+        $func
+    done
     
     # Завершение загрузки
     echo -e "\n${GREEN}System boot completed successfully!${NC}"
-    echo -e "${YELLOW}Boot time: 12.7s (firmware) + 8.3s (loader) + 25.2s (kernel) = 46.2s${NC}"
-    echo -e "${CYAN}Debian GNU/Linux 11 (bullseye) - Kernel $REAL_KERNEL $REAL_ARCH${NC}"
+    echo -e "${YELLOW}Boot time: 14.2s (firmware) + 9.8s (loader) + 68.4s (kernel) = 92.4s${NC}"
+    echo -e "${CYAN}$REAL_OS - Kernel $REAL_KERNEL $REAL_ARCH${NC}"
     echo ""
     
-    # Фейковое приглашение командной строки
+    # Фейковое приглашение
     echo -n "$REAL_HOSTNAME login: "
     sleep 1.2
     echo "$REAL_USER"
@@ -481,11 +711,11 @@ main() {
     echo -e "${GREEN}● systemd\n   State: running${NC}"
     echo -n "$REAL_USER@$REAL_HOSTNAME:~$ "
     sleep 1
-    echo "echo 'System fully operational with real data integration'"
-    echo "System fully operational with real data integration"
+    echo "echo 'System fully operational with 30-stage boot sequence'"
+    echo "System fully operational with 30-stage boot sequence"
 }
 
-# Проверка на Debian и запуск
+# Проверка и запуск
 if [ -f /etc/debian_version ]; then
     main "$@"
 else
